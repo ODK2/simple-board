@@ -2,11 +2,15 @@ package com.example.simpleboard.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) //JPA용 기본 생성자
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post {
 
     @Id
@@ -17,7 +21,13 @@ public class Post {
     private String content;
     private String writer;
 
-    @Builder //이 생성자 기준으로 builder 생성됨
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    @Builder
     public Post(String title, String content, String writer) {
         this.title = title;
         this.content = content;

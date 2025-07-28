@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>게시글 상세보기</title>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <h2>게시글 상세보기</h2>
@@ -13,11 +14,11 @@
 <p><strong>작성자:</strong> <span th:text="${post.writer}">작성자</span></p>
 
 <br>
-<a th:href="@{'/posts/edit/' + ${post.id}}">수정</a>
+<a th:href="@{'/posts/' + ${post.id}} + '/edit'">수정</a>
 <button id="deleteBtn" th:attr="data-id=${post.id}">🗑 삭제</button>
 
 <br>
-<a href="/posts/list">⬅ 목록으로 돌아가기</a>
+<a href="/posts">⬅ 목록으로 돌아가기</a>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -26,13 +27,13 @@
     document.getElementById("deleteBtn").addEventListener("click", function () {
       const id = this.getAttribute("data-id");
       if (confirm("정말 삭제하시겠습니까?")) {
-        fetch('/posts/' + id, {
+        fetch('/api/posts/' + id, {
           method: 'DELETE'
         })
         .then(res => {
           if (res.ok) {
             alert("삭제 완료!");
-            location.href = "/posts/list";
+            location.href = "/posts";
           } else {
             alert("삭제 실패");
           }

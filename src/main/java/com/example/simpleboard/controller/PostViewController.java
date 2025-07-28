@@ -7,30 +7,37 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 @Controller
+@RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostViewController {
+
     private  final PostService postService;
 
-    @GetMapping("/posts/list")
-    public String showPostList(Model model) {
-        List<Post> postList = postService.findAll();
-        model.addAttribute("posts",postList);
-        return "postList"; // -> templates/postList.html
+    @GetMapping
+    public String listPosts(Model model) {
+        model.addAttribute("posts", postService.findAll());
+        return "postList";
     }
 
-    @GetMapping("/posts/list/{id}")
-    public String showPostDetail(@PathVariable Long id, Model model) {
+    @GetMapping("/new")
+    public String newPostForm() {
+        return "postForm";
+    }
+
+    @GetMapping("/{id}")
+    public String viewPost(@PathVariable Long id, Model model) {
         Post post = postService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글 없음: " + id));
         model.addAttribute("post", post);
         return "postDetail";
     }
 
-    @GetMapping("/posts/edit/{id}")
+    @GetMapping("/{id}/edit")
     public String editPostForm(@PathVariable Long id, Model model) {
         Post post = postService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글 없음: " + id));

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController //JSON을 반환하는 컨트롤러 (HTML X)
-@RequestMapping("/posts") //이 클래스의 모든 메서드는 /posts URL 하위에서 동작함
+@RequestMapping("/api/posts") //이 클래스의 모든 메서드는 /posts URL 하위에서 동작함
 public class PostController {
 
     //비즈니스 로직을 담당하는 서비스 계층 (DB 연결 등은 이 안에서 처리됨)

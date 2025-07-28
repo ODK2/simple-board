@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>게시글 작성</title>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <h2>게시글 작성</h2>
@@ -14,11 +15,9 @@
   <label>내용: <textarea id="content" rows="5" cols="30"></textarea></label><br><br>
   <button type="submit">등록</button>
   <td>
-    <a th:href="@{/posts/list}">목록으로 이동</a>
+    <a th:href="@{/posts}">목록으로 이동</a>
   </td>
 </form>
-
-<p id="responseMsg"></p>
 
 <script>
   document.getElementById("postForm").addEventListener("submit", function (e) {
@@ -30,19 +29,23 @@
           writer: document.getElementById("writer").value
       };
 
-      fetch("/posts", {
+      fetch("/api/posts", {
           method: "POST",
           headers: {
               "Content-Type": "application/json"
           },
           body: JSON.stringify(postData)
-      })
-      .then(res => res.text())
-      .then(data => {
-          document.getElementById("responseMsg").textContent = data;
-      })
-      .catch(err => {
-          document.getElementById("responseMsg").textContent = "오류 발생: " + err;
+      }).then(res => {
+        if (!res.ok) {
+            throw new Error("등록 실패! 관리자에게 문의하세요.");
+        }
+        return res.json(); // 응답이 JSON일 경우
+      }).then(data => {
+          alert("등록 완료!");
+          location.href = "/posts/" + data.id; // 등록된 글 상세보기로 이동
+      }).catch(err => {
+          alert("등록 실패! 관리자에게 문의하세요.");
+          console.error(err);
       });
   });
 </script>
