@@ -2,6 +2,8 @@ package com.example.simpleboard.service;
 
 import com.example.simpleboard.domain.Post;
 import com.example.simpleboard.repository.PostRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,5 +35,10 @@ public class PostService {
     //삭제
     public void delete(Long id) {
         postRepository.deleteById(id);
+    }
+
+    //페이징
+    public Page<Post> findAll(Pageable pageable) {
+        return postRepository.findAll(pageable);
     }
 }

@@ -23,6 +23,12 @@ public class Post {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+    
+    //페이징시 createdAt이 null이라면 정렬이 이상해질 수 있음 -초기화
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;

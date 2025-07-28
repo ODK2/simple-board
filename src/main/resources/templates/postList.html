@@ -20,14 +20,15 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="post : ${posts}">
+    <tr th:each="post : ${posts.content}">
       <td th:text="${post.id}">1</td>
-      <td><a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}">제목</a></td>
+      <td>
+        <a th:href="@{|/posts/${post.id}|}" th:text="${post.title}">제목</a>
+      </td>
       <td th:text="${post.writer}">작성자</td>
       <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</td>
       <td>
-        <a th:href="@{'/posts/' + ${post.id} + '/edit'}">✏ 수정</a>
-        <a href="#" th:attr="data-id=${post.id}" class="delete-btn">🗑 삭제</a>
+        <button class="delete-btn" th:attr="data-id=${post.id}">삭제</button>
       </td>
     </tr>
     </tbody>
@@ -36,6 +37,22 @@
   <div class="bottom-actions">
     <a href="/posts/new" class="write-btn">✍ 새 글 쓰기</a>
   </div>
+</div>
+
+<div class="pagination">
+  <span th:if="${posts.hasPrevious()}">
+    <a th:href="@{/posts(page=${posts.number - 1})}">이전</a>
+  </span>
+
+  <span th:each="i : ${#numbers.sequence(0, posts.totalPages - 1)}">
+    <a th:href="@{/posts(page=${i})}"
+       th:text="${i + 1}"
+       th:classappend="${posts.number == i} ? 'active' : ''">1</a>
+  </span>
+
+  <span th:if="${posts.hasNext()}">
+    <a th:href="@{/posts(page=${posts.number + 1})}">다음</a>
+  </span>
 </div>
 
 <script>

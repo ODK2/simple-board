@@ -39,7 +39,6 @@ public class CommentService {
     public void update(Long id, CommentRequest request) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다: " + id));
-
         comment.setAuthor(request.author());
         comment.setContent(request.content());
     }
