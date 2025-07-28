@@ -1,6 +1,8 @@
 package com.example.simpleboard.controller;
 
+import com.example.simpleboard.domain.Comment;
 import com.example.simpleboard.domain.Post;
+import com.example.simpleboard.service.CommentService;
 import com.example.simpleboard.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,6 +19,7 @@ import java.util.List;
 public class PostViewController {
 
     private  final PostService postService;
+    private  final CommentService commentService;
 
     @GetMapping
     public String listPosts(Model model) {
@@ -33,7 +36,12 @@ public class PostViewController {
     public String viewPost(@PathVariable Long id, Model model) {
         Post post = postService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글 없음: " + id));
+
+        // 🔥 댓글 리스트 가져오기
+        List<Comment> comments = commentService.findByPost(id);
+
         model.addAttribute("post", post);
+        model.addAttribute("comments", comments); // ✅ 모델에 댓글 추가
         return "postDetail";
     }
 

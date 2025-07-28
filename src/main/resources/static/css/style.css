@@ -44,6 +44,13 @@ form {
     margin: 0 auto;
 }
 
+.comment-form {
+  width: 100%;
+  max-width: 600px;
+  margin-left: 0; /* 왼쪽 정렬 */
+  margin-right: auto;
+}
+
 label {
     display: inline-block;
     margin-bottom: 8px;

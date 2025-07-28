@@ -5,42 +5,155 @@
   <title>게시글 상세보기</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
+
+<!-- postId를 data-post-id로 저장 -->
 <body>
+
 <h2>게시글 상세보기</h2>
 
 <p><strong>ID:</strong> <span th:text="${post.id}">1</span></p>
 <p><strong>제목:</strong> <span th:text="${post.title}">제목</span></p>
 <p><strong>내용:</strong> <span th:text="${post.content}">내용</span></p>
 <p><strong>작성자:</strong> <span th:text="${post.writer}">작성자</span></p>
+<p><strong>작성일:</strong> <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span></p>
 
-<br>
-<a th:href="@{'/posts/' + ${post.id}} + '/edit'">수정</a>
+<hr>
+
+<h3>댓글</h3>
+<div id="commentList">
+  <div th:each="comment : ${comments}" class="comment-box">
+    <p><strong th:text="${comment.author}">작성자</strong>:
+      <span th:text="${comment.content}">내용</span></p>
+    <p><small th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}"></small></p>
+    <button type="button" th:onclick="|deleteComment(${comment.id})|">삭제</button>
+    <hr>
+  </div>
+</div>
+
+<h4>댓글 작성</h4>
+<form id="commentForm" class="comment-form">
+  <input type="text" id="author" placeholder="작성자" required><br>
+  <textarea id="commentContent" placeholder="댓글 내용" required></textarea><br>
+  <button type="submit">등록</button>
+</form>
+
+<div th:each="comment : ${comments}" class="comment-box" th:id="'comment-' + ${comment.id}">
+  <p>
+    <strong th:text="${comment.author}">작성자</strong>:
+    <span th:text="${comment.content}" th:id="'content-' + ${comment.id}">내용</span>
+  </p>
+  <p><small th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}"></small></p>
+  <button type="button" th:onclick="|deleteComment(${comment.id})|">삭제</button>
+  <button type="button" th:onclick="|editComment(${comment.id})|">수정</button>
+  <hr>
+</div>
+
+<hr>
+
+<a th:href="@{|/posts/${post.id}/edit|}">수정</a>
 <button id="deleteBtn" th:attr="data-id=${post.id}">🗑 삭제</button>
 
 <br>
 <a href="/posts">⬅ 목록으로 돌아가기</a>
 
-<script>
+<!-- 댓글 JS -->
+<script th:inline="javascript">
   document.addEventListener("DOMContentLoaded", function () {
-    debugger; // ✅ 이 줄에서 중단점 잘 걸림!
 
+    // 게시글 삭제
     document.getElementById("deleteBtn").addEventListener("click", function () {
       const id = this.getAttribute("data-id");
       if (confirm("정말 삭제하시겠습니까?")) {
-        fetch('/api/posts/' + id, {
-          method: 'DELETE'
+        fetch("/api/posts/" + id, { method: "DELETE" })
+          .then(res => {
+            if (res.ok) {
+              alert("삭제 완료!");
+              location.href = "/posts";
+            } else {
+              alert("삭제 실패");
+            }
+          });
+      }
+    });
+
+    // 댓글 등록
+    const commentForm = document.getElementById("commentForm");
+    if (commentForm) {
+      commentForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const postId = /*[[${post.id}]]*/ 0;
+        const author = document.getElementById("author").value.trim();
+        const content = document.getElementById("commentContent").value.trim();
+
+        if (!author || !content) {
+          alert("작성자와 내용을 입력해주세요.");
+          return;
+        }
+
+        const commentData = { postId, author, content };
+
+        fetch("/api/comments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(commentData)
         })
         .then(res => {
           if (res.ok) {
-            alert("삭제 완료!");
-            location.href = "/posts";
+            location.reload();
+            alert("댓글 작성을 완료 했습니다.");
           } else {
-            alert("삭제 실패");
+            alert("댓글 등록 실패!");
           }
         });
+      });
+    }
+
+    // 댓글 삭제
+    window.deleteComment = function(commentId) {
+      if (confirm("댓글을 삭제하시겠습니까?")) {
+        fetch("/api/comments/" + commentId, { method: "DELETE" })
+          .then(res => {
+            if (res.ok) {
+              location.reload();
+            } else {
+              alert("댓글 삭제 실패!");
+            }
+          });
       }
-    });
+    };
   });
+
+  function editComment(commentId) {
+  const contentSpan = document.getElementById("content-" + commentId);
+  const originalContent = contentSpan.innerText;
+
+  const newContent = prompt("댓글을 수정하세요:", originalContent);
+  if (newContent === null || newContent.trim() === "") return;
+
+  const author = contentSpan.previousElementSibling?.innerText || "작성자";
+  const postId = document.body.dataset.postId;
+
+  const updatedData = {
+    postId,
+    author,
+    content: newContent.trim()
+  };
+
+  fetch("/api/comments/" + commentId, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatedData)
+  })
+  .then(res => {
+    if (res.ok) {
+      alert("수정 완료!");
+      location.reload();
+    } else {
+      alert("수정 실패!");
+    }
+  });
+}
 </script>
 </body>
 </html>
