@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 수정</title>
+</head>
+<body>
+<h2>게시글 수정</h2>
+
+<form id="editForm" th:attr="data-id=${post.id}">
+  <label>제목: <input type="text" id="title" th:value="${post.title}"></label><br><br>
+  <label>작성자: <input type="text" id="writer" th:value="${post.writer}"></label><br><br>
+  <label>내용: <textarea id="content" rows="5" cols="30" th:text="${post.content}"></textarea></label><br><br>
+  <button type="submit">수정 완료</button>
+  <a th:href="@{/posts/list}">목록으로</a>
+</form>
+
+<p id="responseMsg"></p>
+
+<script>
+  document.getElementById("editForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const id = this.getAttribute("data-id");
+    const postData = {
+      title: document.getElementById("title").value,
+      content: document.getElementById("content").value,
+      writer: document.getElementById("writer").value
+    };
+
+    fetch("/posts/" + id, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(postData)
+    })
+    .then(res => {
+      if (res.ok) {
+        alert("수정 완료!");
+        location.href = "/posts/list/" + id;
+      } else {
+        alert("수정 실패");
+      }
+    })
+    .catch(err => {
+      document.getElementById("responseMsg").textContent = "오류 발생: " + err;
+    });
+  });
+</script>
+
+</body>
+</html>

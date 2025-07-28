@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 작성</title>
+</head>
+<body>
+<h2>게시글 작성</h2>
+
+<form id="postForm">
+  <label>제목: <input type="text" id="title"></label>
+  <label>작성자: <input type="text" id="writer"></label>
+  <br><br>
+  <label>내용: <textarea id="content" rows="5" cols="30"></textarea></label><br><br>
+  <button type="submit">등록</button>
+  <td>
+    <a th:href="@{/posts/list}">목록으로 이동</a>
+  </td>
+</form>
+
+<p id="responseMsg"></p>
+
+<script>
+  document.getElementById("postForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const postData = {
+          title: document.getElementById("title").value,
+          content: document.getElementById("content").value,
+          writer: document.getElementById("writer").value
+      };
+
+      fetch("/posts", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify(postData)
+      })
+      .then(res => res.text())
+      .then(data => {
+          document.getElementById("responseMsg").textContent = data;
+      })
+      .catch(err => {
+          document.getElementById("responseMsg").textContent = "오류 발생: " + err;
+      });
+  });
+</script>
+
+</body>
+</html>
